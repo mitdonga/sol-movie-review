@@ -1,4 +1,4 @@
-
+import * as borsh from '@coral-xyz/borsh'
 export class Movie {
     title: string;
     rating: number;
@@ -9,6 +9,35 @@ export class Movie {
         this.rating = rating;
         this.description = description;
     }
+
+		static borshAccountSchema = borsh.struct([
+			borsh.bool("initialized"),
+			borsh.u8("rating"),
+			borsh.str("title"),
+			borsh.str("description"),
+		])
+
+		static borshSchema = borsh.struct([
+			borsh.u8("variant"),
+			borsh.str("title"),
+			borsh.u8("rating"),
+			borsh.str("description"),
+		])
+
+		static deserialize(buffer:Buffer): Movie | null {
+			try {
+				const {variant, title, rating, description} = Movie.borshAccountSchema.decode(buffer)
+				return new Movie(title, rating, description)
+			} catch(err) {
+				return null
+			}
+		}
+
+		serialize(): Buffer {
+			const tmpBuffer = Buffer.alloc(8+200+8+1000)
+			Movie.borshSchema.encode({...this, variant: 0}, tmpBuffer)
+			return tmpBuffer.slice(0, Movie.borshSchema.getSpan(tmpBuffer))
+		}
 
     static mocks: Movie[] = [
         new Movie('The Shawshank Redemption', 5, `For a movie shot entirely in prison where there is no hope at all, shawshank redemption's main massage and purpose is to remind us of hope, that even in the darkest places hope exists, and only needs someone to find it. Combine this message with a brilliant screenplay, lovely characters and Martin freeman, and you get a movie that can teach you a lesson everytime you watch it. An all time Classic!!!`),
