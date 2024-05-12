@@ -14,3 +14,15 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.movie-page-btn-container {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+.movie-page-btn-container button {
+	background-color: aliceblue;
+	padding: 5px;
+	border-radius: 5px;
+}
